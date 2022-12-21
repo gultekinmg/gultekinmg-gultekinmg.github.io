@@ -1,0 +1,129 @@
+body{/* text-align:center; */margin:0;cursor: pointer;background-image:url('./img/carpet.jpg');}    
+div,label,button,input,select,span {cursor: pointer;}
+
+:root {
+  --bg: red;
+  --txt: blue;  
+  --sub: 15px;
+	--lightning: #ff4545;
+	--shadow: 0px 5px 1px rgba(179, 170, 170, 0.2), #d5d6b79e 0px 0px 4px 0.4px inset;
+}
+.SETTINGS{background-color:darkgray;padding:5;}
+#divKEYBOARD{position:relative;height:99px;border-top:solid 16px #777;border-bottom: solid 1px #90828282;
+    background-color: #ffffffe3;
+    box-shadow: rgb(95, 80, 0) 0px 0px 9px 3px inset;
+		user-select:none;-webkit-user-select:none;-moz-user-select:none;-o-user-select:none;}
+	/* position:relative;height:99px;border-top:solid 11px;box-shadow:rgb(90, 80, 26) 0px 0px 9px 2px inset; */
+
+.key{position:absolute;font-family:Helvetica;font-weight:100;font-size:11px;margin-left:-10px;
+	border: 0.9px solid rgba(32,32,32,0.5);border-radius: 0px 0px 5px 5px;box-shadow: var(--shadow);
+	-webkit-transition: margin 0.2s ease, background-color 0.05s ease, box-shadow 0.1s ease; }
+.key .labelDiv{position:absolute;text-align:center;left:0px;right:0px;}
+.keyLabel{position:absolute;left:4;font-size:18px;display:none;color:red;}
+.black{width:18px;height:50px;background:rgb(78, 25, 25);color:#ffffff;font-size:10px;z-index:1;
+	position: relative;float: left;box-shadow: 2px 4px 2px rgb(179, 170, 170), #b1ae55 0px 1px 2px 1px inset;
+	/* text-shadow:0px -1px 1px #FF0000; */}
+#divKEYBOARD .black .labelDiv{top:10px;color:#d6c636b0;}
+#divKEYBOARD .black .labelDiv p {margin:6 2 0 2;border:solid 1px #c6d01321;border-radius:22px;color:#000000e0;background-color:#ffff00;}
+#divKEYBOARD .black .labelDiv span {position:absolute;width:11;height:9;left:4;top:-23;font-size:9;
+    opacity:0.5;color:blue;background-color:yellow;/* border:1px solid rgba(0, 0, 0, 0.3); */border-radius:2px;}
+.black:hover{background: rgb(165, 136, 136);}
+.white{position: relative; float: left;  width: 24px; height: 90px; background: #ffffcdf0; color: #3008F5;    
+    box-shadow: 0.4px 4px 2px rgb(93, 75, 75), #d5d6b79e 0px 0px 4px 0.4px inset;z-index: 0;}		
+/* 	border: solid .1px #3e420863; 	position:relative;float:left;width:24px;height:90px;background:#ffffcda3;color:#3008F5;box-shadow: 0.4px 4px 2px rgba(216, 162, 162, 0.6), #d5d6b79e 0px 0px 4px 0.4px inset;z-index:0; */
+#divKEYBOARD .white .labelDiv{bottom:29px;text-shadow: 0px 0px 1px #039ca580;}
+#divKEYBOARD .white .labelDiv p {margin: 0 3 0 3;border:solid 1px #8080801a;border-radius:22px;color:#9494048f;background-color:#ffff0054;}
+#divKEYBOARD .white .labelDiv span {position:absolute;width:11;height:9;left:7;top:-60;font-size:9;
+    opacity:0.5;color:blue;background-color:yellow;/* border: 1px solid rgba(0, 0, 0, 0.3);*/border-radius:2px; }
+.white:hover{background:#f5f56b}
+#divKEYBOARD .key:nth-child(50){background:#f5f5bf;}
+
+#CHORDDEMO,#RITHMDEMO {font-size:12;width:490;position:absolute;margin-top:10;right:360;background-color:#c2ffffc2;border:1px solid #80808036;display:none;z-index:98;}
+#RITHMDEMO {margin-top:80;}
+#divACCOMPANYboard .white{height:50px;background:pink;}
+#divACCOMPANYboard .black{height:25px;background:purple;}
+#divQCHORDSboard .white{height:50px;}
+#divQCHORDSboard .black{height:25px;}
+
+
+#chordform {position:absolute;text-align:left;background-color: beige;}
+#CHORDROOT{color:#1c87c9;background-color:#eee;margin: -4px -16px -44px 0px; font-size:33px;}
+.vertical{ border-radius:9px;	color:#aaa;background-color:#eee;font-size:18px;}
+.chordselector select option, .vertical select option { display:inline-block;}
+.chordselector, .vertical { display:inline-block; vertical-align:top; overflow:hidden;}
+#chordform span{float:right; margin-right:8px; color:#1c87c9; font-size:18px;}
+#chordform_frame input[type="button"]{font-weight:600;color:brown;}
+
+#CONTROLS{position:absolute;top:44;left:55;zoom: 0.8;}
+#MIXERCONTROLS{position:absolute; top:30; left:183; width:240;font-size:10px;}
+#MONITOR{width:400px;height:90px;position:absolute;left:440px;top:32px;
+    border: 5px ridge rgba(193, 173, 173);color:#0000ff94; background-color: #b1c7c7;}
+#MONITOR p{margin:0;font-size:16px;}
+#PEDALS{position:absolute;left:880px;top:32px;font-size:12;}
+#PEDALS div{float:left; margin: 50 0 0 0;}
+.pedal {margin-left:-33px;width:66px;height:9px;transform:rotate(270deg);cursor:pointer;outline:none;
+	opacity:0.3;background:#d3d3d3;border: dotted 2px gray; -webkit-appearance:none;-webkit-transition:.2s;transition:opacity .2s;}
+.pedal:hover{opacity:1;}
+.pedal::-webkit-slider-thumb{width:40px; height:30px;background:#4CAF50;-webkit-appearance:none; appearance:none; border-radius:5px;}
+.goldy::-webkit-slider-thumb{width:40px; height:30px;background:#FFF3B1;border: solid 1px gray;}
+.bluee::-webkit-slider-thumb{width:30px; height:22px;background:#DAEBDF;border: solid 1px gray;}
+.graie::-webkit-slider-thumb{width:30px; height:25px;background:#DEDAB1;border: solid 2px gray;}
+.tinie::-webkit-slider-thumb{width:10px; height:11px;background:#DEDAB1;border: solid 2px gray;}
+
+.rthm_volume{position:absolute;width:60px;}
+.rthm_volume::-webkit-slider-thumb{width:20px;height:20px;background:gray;-webkit-appearance:none;appearance:none;border-radius:5px;}
+
+.inverse{direction: rtl; display: inline-block;}/* to keep parent at the left of window */
+/* .inverse input{opacity:0.4; height:8px; width:8px;margin-left:-5px;background-color: yellow;} */
+
+label input, #CHORDDEMO label ~input, #RITHMDEMO label ~input {border:none; width:6;overflow:hidden;margin:0;padding:0;}
+.recLabel{margin-left:0px;padding:1px;border:solid 1px gray;border-radius:0.2rem;}
+.recLabel:hover{background:pink;opacity:1;}
+.ac_lbl{margin-left:5px;padding:0.3px;border:solid 0.5px gray;border-radius:0.2rem; position:relative;}/* color:black;width:88px;height:1.5em; */
+label input:checked ~ label, label ~input checked ~ label{background:red;color:white;}
+.ac_lbl input{margin-left:-5px;background:white;}
+label input:before {content:"";position:absolute;left:0;top:0;height:100%;width:100%;background:rgba(255,255,30,0.59);border-radius:0.2rem;
+										z-index:-1;transition:background .2s linear;}
+label input:hover:before{background:pink;opacity:1;}
+label input:checked:before {background:yellow;opacity: 0.9;}
+
+#recordsong_label{margin-left:-7px;border:solid 2px red;}
+#recordsong:checked ~ #recordsong_label{background:#ffb8b8;}
+/* #recordsong:checked ~ #demo:after{content: "recording..";font-size:10px;}
+#demo:after{content:"ready";font-size:12px;} */
+#loop_label{margin-left: 2px; background: rgba(199, 220, 236, 0.77);}
+/* .visually-hidden{opacity:0.4;
+    position:absolute;left: -100vw;#00FF00box-shadow: 1px 1px 3px #222222;
+		Note, you may want to position the checkbox over top the label and set the opacity to zero instead.
+		It can be better for accessibilty on some touch devices for discoverability.
+} */
+
+
+.dblk{margin-left:-23px;width:30px;height:6px;transform:rotate(270deg);z-index:9;cursor:pointer;/* outline:none; */
+	opacity:0.4;background:#d3d3d3;border: dotted 2px gray; -webkit-appearance:none;-webkit-transition:.2s;transition:opacity .2s;}
+.dblk:hover{opacity:1;}
+.dblk::-webkit-slider-thumb{width:9px; height:13px;background:#4CAF50;-webkit-appearance:none; appearance:none; border-radius:5px;}
+
+[mytip]{position: relative;z-index: 999999;}	
+[mytip]:hover:after {margin-left:-133px;margin-bottom:-60px;height:33px;visibility:visible;opacity:0.9;
+		transition: all 0.1s ease 0.05s;}
+[mytip]:after {
+    content: attr(mytip);
+    position: absolute;bottom:-2em;left:100%;padding: 4px 4px 4px 8px;
+    color: #000;font-size: 150%; 
+    white-space: nowrap; border: 1px solid #111111;
+    -moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;  
+    -moz-box-shadow: 0px 0px 4px #222;-webkit-box-shadow: 0px 0px 4px #222;box-shadow: 0px 0px 4px #222;  
+    background-image: -moz-linear-gradient(top, #00FF00, #cccccc);  
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #00FF00),color-stop(1, #cccccc));
+    background-image: -webkit-linear-gradient(top, #00FF00, #cccccc);  
+    background-image: -moz-linear-gradient(top, #00FF00, #cccccc);  
+    background-image: -ms-linear-gradient(top, #00FF00, #cccccc);  
+    background-image: -o-linear-gradient(top, #00FF00, #cccccc);
+    opacity: 0;    
+    visibility: hidden;
+}	
+
+
+#wac-value-tip {}
+

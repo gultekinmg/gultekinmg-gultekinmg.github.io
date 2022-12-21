@@ -1,0 +1,671 @@
+<html>
+	<head>
+    <title>Web MIDI Synth Host</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORwOKGO=" /><!-- workaround to prevent "favicon not found" exceptions in Chrome.-->
+		
+		<link href="__myKeyboard.css" rel="stylesheet" type="text/css">
+		<script src="vendors/_input_img_knobs.js">window.inputKnobsOptions={}///glob///</script>
+		<script src="js/colors.js">//color names array</script>
+			<!-- <script src="js/timeouts.js">//window replace</script> fkin window timeouts complexbuggy-->
+			<!-- <script src="js/moduleLoader.js">/// omg js module loader</script> -->
+	</head>
+	<body>
+		
+		<div><!--KEYBOARD -->
+
+		<button mytip="toggle panel" style="position:fixed;top:0;right:0;color:red;border:ridge;z-index:99;" onclick="dsply_frm('COVER','');">X</button>
+		<div id="COVER" style="display: block;">
+			<div class="SETTINGS">
+				<button id="chordform_on"onclick="dsply_frm('chordform','_frame');msg.innerHTML='Theory.'; evnt.innerHTML='click chords...';">Chords Theory</button>
+				<select id="size" style="background-color:#e1f3f3;" onchange="setSize(this.selectedIndex+1);">
+					<option value="1">108Keys</option>
+					<option value="2">84keys</option>
+					<option value="3">72keys</option>
+					<option value="4"selected>60Keys</option>
+					<option value="5">32Keys</option>
+					<option value="6">24keys</option>
+					<option value="7">12keys</option>
+				</select>
+
+				<button mytip="octave+" style="background-color:#e1f3f3;" onclick='slide(-12);'>&#60;</button>
+				<button mytip="octave-" style="background-color:#e1f3f3;" onclick='slide(12);'>&#62;</button>
+				<button mytip="keyboard play" style="" onclick="lettON=!lettON; keyLETTERS();"><small>Letters</small></button>
+				<label  mytip="extent to A" class="recLabel" for="exta">xA
+					<input id="exta"type="checkbox" class="input-switch"style="margin:-6px;"
+						data-src="./img/knobs/switch_toggle.png" 
+						onclick="if(this.checked){lower-=3;upper+=1;}else{lower+=3;upper-=1;};sizingKeys();"/>
+				</label>
+
+				<input id="zoomSlider"mytip="zoom" style="width:50px;cursor:zoom-in;" type="range"min="75"max="130"value="100"
+					ondblclick="this.value=100; visualKeyboard.style.zoom='100%';"
+					onchange="visualKeyboard.style.zoom=this.value+'%';"/>
+
+				<label mytip="Sound font file:_FluidR3_GM_sf2.js" >INSTRUMENT</label>
+				<label mytip="inst.1" class="recLabel" for="inst.1">1
+				<input id='inst.1'type="radio" name="INSTX" class="input-switch"style="margin:-6px;"
+					data-src="./img/knobs/switch_toggle.png" 				
+					onclick="if(this.checked){fnSETUPPRESETS(1);/*important*/}"checked/>
+				</label>
+				<label mytip="inst.2" class="recLabel" for="inst.2">2
+					<input id='inst.2'type="radio" name="INSTX" class="input-switch"style="margin:-6px;"
+					data-src="./img/knobs/switch_toggle.png" 
+					onclick="if(this.checked){fnSETUPPRESETS(2);}"/>
+				</label>
+				<label mytip="inst.3" class="recLabel" for="inst.3">3
+					<input id='inst.3'type="radio" name="INSTX" class="input-switch"style="margin:-6px;"
+					data-src="./img/knobs/switch_toggle.png" 
+					onclick="if(this.checked){fnSETUPPRESETS(3);}">
+				</label>
+				<label mytip="inst.4" class="recLabel" for="inst.4">4
+					<input id='inst.4'type="radio" name="INSTX" class="input-switch"style="margin:-6px;"
+					data-src="./img/knobs/switch_toggle.png" 
+					onclick="if(this.checked){fnSETUPPRESETS(4);}"/>
+				</label>
+				<label mytip="inst.5" class="recLabel" for="inst.5">5
+					<input id='inst.5'type="radio" name="INSTX" class="input-switch"style="margin:-6px;"
+					data-src="./img/knobs/switch_toggle.png" 
+					onclick="if(this.checked){fnSETUPPRESETS(5);}"/>
+				</label>
+				<select id="channelSelect" class="valueSelector"style="font-size:12;background-color:#ddd;"
+					onchange="WebMIDI.host.onChannelSelectChanged()">
+						<option value="0">0</option>
+						<option value="1" selected>1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+				</select>
+
+				<select style="font-size:12;margin-left:-4;width:88;background-color:#ddd;" onchange='fnFILTER(this.value,"instruments");'>
+					<option value=" ">All</option>
+					<option value="piano" selected>piano</option>
+					<option value="ChromaticPercussion">Percussion</option>
+					<option value="Organ">Organ</option>
+					<option value="Guitar">Guitar</option>
+					<option value="Bass">Bass</option>
+					<option value="Strings">Strings</option>
+					<option value="Ensemble">Ensemble</option>
+					<option value="Brass">Brass</option>
+					<option value="Reed">Reed</option>
+					<option value="Synth">Synth</option>
+					<option value="Ethnic">Ethnic</option>
+					<option value="Percussiv">Percussive</option>
+					<option value="SoundEffects">SoundEffects</option>
+				</select>
+
+				<select id="instruments"style="font-size:12;margin-left:-4;width:255;background-color:#ddd;"></select>
+				<select id="percussion" style="background-color:#e1f3f3;font-size: 10;" onchange="alert(this.selectedIndex+1);">
+						<option value="35"selected>AcoBass Drum</option>  
+						<option value="36">Bass Drum 1</option>   					
+						<option value="37">Side Stick</option>    					
+						<option value="38">Acoustic Snare</option>					
+						<option value="39">Hand Clap</option>     					
+						<option value="40">Electric Snare</option>					
+						<option value="41">Low Floor Tom</option> 					
+						<option value="42">Closed Hi Hat</option> 					
+						<option value="43">High Floor Tom</option>					
+						<option value="44">Pedal Hi-Hat</option>  					
+						<option value="45">Low Tom</option>       					
+						<option value="46">Open Hi-Hat</option>   					
+						<option value="47">Low-Mid Tom</option>   					
+						<option value="48">Hi-Mid Tom</option>    					
+						<option value="49">Crash Cymbal 1</option>					
+						<option value="50">High Tom</option>      					
+						<option value="51">Ride Cymbal 1</option> 					
+						<option value="52">Chinese Cymbal</option>					
+						<option value="53">Ride Bell</option>     					
+						<option value="54">Tambourine</option>    					
+						<option value="55">Splash Cymbal</option> 					
+						<option value="56">Cowbell</option>       					
+						<option value="57">Crash Cymbal 2</option>					
+						<option value="58">Vibraslap</option>     					
+						<option value="59">Ride Cymbal 2</option> 					
+						<option value="60">Hi Bongo</option>      					
+						<option value="61">Low Bongo</option>     					
+						<option value="62">Mute Hi Conga</option> 					
+						<option value="63">Open Hi Conga</option> 					
+						<option value="64">Low Conga</option>     					
+						<option value="65">High Timbale</option>  					
+						<option value="66">Low Timbale</option>   					
+						<option value="67">High Agogo</option>    					
+						<option value="68">Low Agogo</option>     					
+						<option value="69">Cabasa</option>        					
+						<option value="70">Maracas</option>       					
+						<option value="71">Short Whistle</option> 					
+						<option value="72">Long Whistle</option>  					
+						<option value="73">Short Guiro</option>   					
+						<option value="74">Long Guiro</option>    					
+						<option value="75">Claves</option>        					
+						<option value="76">Hi Wood Block</option> 					
+						<option value="77">Low Wood Block</option>					
+						<option value="78">Mute Cuica</option>    					
+						<option value="79">Open Cuica</option>    					
+						<option value="80">Mute Triangle</option> 					
+						<option value="81">Open Triangle</option>
+				</select>
+
+				<label mytip="RECORDER" class="recLabel">RECORDER
+					<input type="checkbox" class="input-switch"style="margin:-6px;"
+							data-src="./img/knobs/switch_toggle.png"
+							onclick="dsply_frm('recorder','');
+							if(this.checked)msg.innerHTML='Select slot and click record.';else msg.innerHTML=evnt.innerHTML='.';"/>
+				</label>
+				<label mytip="MIDI.IO" class="recLabel">MIDI.IO
+					<input type="checkbox" class="input-switch"style="margin:-6px;"
+							data-src="./img/knobs/switch_toggle.png"
+							onclick="if(this.checked){
+							msg.innerHTML='Connect MIDI and refresh.';
+							evnt.innerHTML='wait for midi keyboard...';}else {msg.innerHTML=evnt.innerHTML='';}"/>
+				</label>
+			</div>
+			<div class="SETTINGS" style="height:90;">
+				<input type="checkbox" style="opacity:.4;" onchange="if(this.checked}lightingFix=true;else lightingFix=false;"	checked>
+				<label mytip="key light color" class="recLabel">Light.
+					<input type="color" value="#ff4545" style="width:15;height:18;margin-bottom:-4;" onchange="lightingColor=this.value;">
+				</label>
+				<div id="CONTROLS">
+					<span><input id='m-mix' type="range" class="input-knob" value="0" min="0" max="6" step="1"
+								data-sprites="100" data-src="./img/knobs/knob_Silhouettes_100.png"
+									onchange="fnMonText('logger','instrument %'+value)"/>
+					</span>
+					<span><label style='position:absolute;bottom:-12px;margin-left:4px;'>pitch</label>
+							<input id='m-octave' type="range" class="input-knob"
+											data-sprites="100" data-width="40" data-height="100" data-src="./img/knobs/bender100.png"
+											onchange="fnMonText('logger','Pitch %'+value)"/>
+					</span>
+					<span><label style='position:absolute;bottom:-12px;margin-left:4px;'>speed</label>
+							<input id='m-rate' class="input-knob" type="range"min="0"max="127"value="64"step="1"
+										data-sprites="100" data-width="40" data-height="100" data-src="./img/knobs/bender100.png"
+										ondblclick="this.value=1; noteVelocity=1;"
+										onchange="fnMonText('logger','noteVelocity %'+value); noteVelocity=value;"/>
+					</span>
+				</div>			
+				<div id="MIXERCONTROLS">
+					<span><label style='position:absolute;margin-left:4px;'>Left</label>
+						<input id="m-left" type="range" class="input-slider" min="0" max="1" step="0.1"
+							data-width="30" data-height="100" data-sprites="63" data-src="./img/knobs/slider_mixer.png"
+							ondblclick="this.value=1;player.stereo(order,1);"
+							onchange="//player.stereo(order,this.value);"/>
+					</span>
+					<span><label style='position:absolute;margin-left:4px;'>Right</label>
+						<input id="m-rite" type="range" class="input-slider" min="0" max="1" step="0.1"
+							data-width="30" data-height="100" data-sprites="63" data-src="./img/knobs/slider_mixer.png"
+							ondblclick="//player.stereo(order,1);"
+							onchange="//player.stereo(order,this.value);"/>
+					</span>
+					<span><input mytip="main Volume" id="mainvolumeInput" type="range" class="input-slider" min="1" max="127" step="1"
+							data-width="30" data-height="99" data-sprites="200" data-src="./img/knobs/slider_Fader_red.png"
+							ondblclick="value=60;mainVolume=InstVol[instrument[chNO]].gain.value=0.6;"
+							onchange="mainVolume=InstVol[instrument[chNO]].gain.value=Number(value)*0.01;
+												fnMonText('logger','mainVolume %'+value);"/>
+					</span>
+					<span style="position:absolute;top:22;left:122;zoom: 1;">
+						<label style='position:absolute;bottom:-22px;margin-left:4px;'>equalizer.</label>
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band32.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band64.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band128.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band256.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band512.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band1k.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band2k.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band4k.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band8k.gain.setTargetAtTime(value,0,0.0001);">
+						<input class="dblk tinie" type="range" orient="vertical" value="0.0" min="-10.0" max="10.0" step="1" onchange="CHANNELMASTER.band16k.gain.setTargetAtTime(value,0,0.0001);">
+					</span>
+					<span><input id="v_mtr" type="range" value="0" min="0" max="127" step="1" class="input-slider"
+								data-width="60" data-height="40" data-sprites="8" data-src="./img/knobs/meter_gold9.png"/>
+					</span>
+					<button mytip="muteALL" style="position: relative;bottom: 22px;background-color: #ff000070;color:whitesmoke;" onclick="stopPLAYER();">PANIC</button>
+					</div>	
+				<div id='MONITOR'>
+					<p id='msg'>Messages</p>
+					<p id='evnt'>Events...</p>
+					<textarea id="logger" cols="53" rows="3"
+						style="resize:none;position:absolute;left:3;background:#cce4e4;border:ridge 2px #d0bfbf;">Events Handling
+					</textarea>
+				</div>
+				<div id="PEDALS">
+					<div><input mytip="Styled strike" id="tremoloInput" class="pedal bluee" type="range" min="1" max="5" 	value="1"
+						onmousedown="
+							var v=Number(this.value); event.preventDefault(); 
+							if(event.button==0) if(v+1>=6) this.value=1; else this.value=v+1;
+							if(event.button==2) this.value=1;/* riteclick */
+							myPressStyle=Number(this.value); "/>
+					</div>
+					<div><input mytip="sound fader"		id="pedalInput"				class="pedal goldy"	type="range" min="0" max="3"	value="0"
+							onmousedown="
+								var v=Number(this.value); event.preventDefault(); 
+								if(event.button==0) if(v+1>=4) this.value=v=0; else this.value=v=v+1;
+								if(event.button==3) this.value=v=0;
+								pedalFade=v;	"/>
+					</div>
+					<div><input mytip="WahWah" 	id="ahsdrinput"				class="pedal goldy" type="range" min="1" max="3" 	value="1"
+							onmousedown="
+								var v=Number(this.value); event.preventDefault(); 
+								if(event.button==0) if(v+1>=4) this.value=v=1; else this.value=v=v+1;
+								if(event.button==2) this.value=v=1;
+								CustomAHDSR(v);"/>
+					</div>
+					<div><input mytip="reverb" 	id="reverbInput" class="pedal graie" type="range" value="0.5" min="0.0" max="1.5" step="0.1"
+								ondblclick="value=0;reverberator[instrument[chNO]].wet.gain.setTargetAtTime(value,0,0.0001);"
+								onchange="reverberator[instrument[chNO]].wet.gain.setTargetAtTime(value,0,0.0001);"/>					
+					</div>
+					PlayBack <span mytip="slider" style="position:absolute;left:122;">
+						<input id="PBackIn" class="input-knob" type="range" min="0"max="5"value="0"
+										data-sprites="100" data-src="./img/knobs/knob70.png"
+										ondblclick="value=_playbackratio=0;playback(0);"
+										onchange="playback(Number(value));_playbackratio=Number(value);get('playbackTip').innerHTML=value;"/>
+						<span id="playbackTip" style="position:absolute;top:55;left:9;font-size:16;">0</span>
+					</span>
+					AHDSR <span mytip="ahdsr sets" style="position:absolute;right:-33;">
+						<input id="adsrsets" class="input-knob" type="range" min="0"max="3"value="0"
+										data-sprites="100" data-src="./img/knobs/knob70.png"
+										ondblclick="value=0; CustomAHDSR(0);"
+										onchange="CustomAHDSR(Number(value));	get('ahdsrTip').innerHTML=value;"/>
+						<span id="ahdsrTip" style="position:absolute;top:55;left:9;font-size:16;">0</span>
+					</span>
+					<span style="position:absolute;left:-9;top:0;">
+						<label  mytip="noteON KeyPress" class="recLabel" for="kpress">noteON
+							<input id="kpress"type="checkbox" class="input-switch"style="margin:-6px;"
+								data-src="./img/knobs/switch_toggle.png" 
+								onclick="if(this.checked)_NoteOnKeyPressure=true;else _NoteOnKeyPressure=false;"/>
+						</label>
+					</span>
+				</div>	
+				<span style="position:absolute;top: 111;right: 444;"><label mytip="quick CHORDS" class="recLabel" for="qchords">QuickCHORDs
+					<input id="qchords"type="checkbox" class="input-switch"style="margin:-6px;"
+							data-src="./img/knobs/switch_toggle.png" 
+							onclick="dsply_frm('CHORDDEMO','');"/>
+					</label>
+				</span>
+				<span style="position:absolute;top: 111;right: 322;"><label mytip="second sound  ACCOMPANY chords"	title="
+		To Select Accompany instrument,
+			Select an instrument next or change.
+			Then, you can reselect main instrument." class="recLabel" for="inst0">ACCOMPANY
+						<input id='inst0'type="checkbox" class="input-switch"style="margin:-6px;"
+						data-src="./img/knobs/switch_toggle.png" 
+						onclick="if(this.checked){fnSETUPPRESETS(0);}">
+					</label>
+				</span>
+				<p id="recorder" style="position:absolute;top:18;right:166;padding:3;background-color:#c8d2d2;border: ridge 2px #d0bfbf;display:none;">
+					<span>
+					<input id="recordsong"mytip="record a song" type="checkbox"
+						onclick="if(this.checked){COUNTDOWN(4);}
+						else {msg.innerHTML='record ready.';evnt.innerHTML='click play to play checked slots';
+						document.getElementsByName('plays')[recordNO].checked=true;}"/>
+					<label id="recordsong_label" for="recordsong">Recorders</label>
+					<input style="margin-left:-2px;" mytip="slot 0" type="radio" name="rcrds" onclick="if(this.checked)recordNO=0;" checked>
+					<input style="margin-left:-5px;" mytip="slot 1" type="radio" name="rcrds" onclick="if(this.checked)recordNO=1;">
+					<input style="margin-left:-5px;" mytip="slot 2" type="radio" name="rcrds" onclick="if(this.checked)recordNO=2;">
+					<input style="margin-left:-5px;" mytip="slot 3" type="radio" name="rcrds" onclick="if(this.checked)recordNO=3;"> 
+					<input style="margin-left:-5px;" mytip="slot 4" type="radio" name="rcrds" onclick="if(this.checked)recordNO=4;"> 
+					<input style="margin-left:-5px;" mytip="slot 5" type="radio" name="rcrds" onclick="if(this.checked)recordNO=5;">
+					<input style="margin-left:-5px;" mytip="slot 6" type="radio" name="rcrds" onclick="if(this.checked)recordNO=6;">
+					<input style="margin-left:-5px;" mytip="slot 7" type="radio" name="rcrds" onclick="if(this.checked)recordNO=7;">
+					<button id="eraserec" mytip="Erase checked record" style="font-size:10px;"
+									onclick="RECORD[recordNO]=[];document.getElementsByName('plays')[recordNO].checked=false;">Wipe</button>
+					</span>
+					<br>
+					<span><button id="recply"	onclick="for(var i=0;i<8;i++){if(document.getElementsByName('plays')[i].checked) playRECORD(RECORD[i],i);}">Play checks</button>
+					<input style="margin-left:-2px;" mytip="play0" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[0].length>1)playRECORD(RECORD[0],0);} else if(RECORD[0].length>1)stopRecordPLAYER(0);">
+					<input style="margin-left:-5px;" mytip="play1" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[1].length>1)playRECORD(RECORD[1],1);} else if(RECORD[1].length>1)stopRecordPLAYER(1);">
+					<input style="margin-left:-5px;" mytip="play2" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[2].length>1)playRECORD(RECORD[2],2);} else if(RECORD[2].length>1)stopRecordPLAYER(2);">
+					<input style="margin-left:-5px;" mytip="play3" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[3].length>1)playRECORD(RECORD[3],3);} else if(RECORD[3].length>1)stopRecordPLAYER(3);">
+					<input style="margin-left:-5px;" mytip="play4" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[4].length>1)playRECORD(RECORD[4],4);} else if(RECORD[4].length>1)stopRecordPLAYER(4);">
+					<input style="margin-left:-5px;" mytip="play5" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[5].length>1)playRECORD(RECORD[5],5);} else if(RECORD[5].length>1)stopRecordPLAYER(5);">
+					<input style="margin-left:-5px;" mytip="play6" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[6].length>1)playRECORD(RECORD[6],6);} else if(RECORD[6].length>1)stopRecordPLAYER(6);">
+					<input style="margin-left:-5px;" mytip="play7" type="checkbox" name="plays" onclick="if(this.checked){if(RECORD[7].length>1)playRECORD(RECORD[7],7);} else if(RECORD[7].length>1)stopRecordPLAYER(7);">
+					<button id="pstop" mytip="Stop selected records" style="font-size:10px;" 
+						onclick="for(var i=0;i<8;i++){ if(document.getElementsByName('plays')[i].checked) stopRecordPLAYER(i);}
+						">halt</button>
+					</span>
+					<br>
+					<span><label id="loop_label">Looper.check</label>
+					<input style="margin-left:-2px;" mytip="loop0" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[0].length>1)loop[0]='true';} else {loop[0]='false';clearInterval(looptimer[0]);}">
+					<input style="margin-left:-5px;" mytip="loop1" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[1].length>1)loop[1]='true';} else {loop[1]='false';clearInterval(looptimer[1]);}">
+					<input style="margin-left:-5px;" mytip="loop2" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[2].length>1)loop[2]='true';} else {loop[2]='false';clearInterval(looptimer[2]);}">
+					<input style="margin-left:-5px;" mytip="loop3" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[3].length>1)loop[3]='true';} else {loop[3]='false';clearInterval(looptimer[3]);}">
+					<input style="margin-left:-5px;" mytip="loop4" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[4].length>1)loop[4]='true';} else {loop[4]='false';clearInterval(looptimer[4]);}">
+					<input style="margin-left:-5px;" mytip="loop5" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[5].length>1)loop[5]='true';} else {loop[5]='false';clearInterval(looptimer[5]);}">
+					<input style="margin-left:-5px;" mytip="loop6" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[6].length>1)loop[6]='true';} else {loop[6]='false';clearInterval(looptimer[6]);}">
+					<input style="margin-left:-5px;" mytip="loop7" type="checkbox" name="loops" onclick="if(this.checked){if(RECORD[7].length>1)loop[7]='true';} else {loop[7]='false';clearInterval(looptimer[7]);}">
+					<button id="lstop" mytip="Stop selected loops" style="font-size:10px;" 
+						onclick="
+							for(var i=0;i<8;i++){
+								if(document.getElementsByName('loops')[i].checked){
+									document.getElementsByName('loops')[i].checked=false;
+									stopRecordPLAYER(i);
+								}
+							}
+						">halt</button>
+					</span>
+					<br>
+					<span id="demo"></span>
+				</p>
+			</div>
+		</div>
+		<div id="divKEYBOARD"><span id="bosh" style="width:11px;height:50px;position:relative;float:left;"></span></div>
+		<span id="CHORDDEMO">
+				<div id="COMPANY1" style="position:absolute;right:-99;">
+					<input mytip="subVolume" id="subVolumeInput" type="range" class="input-knob" min="1" max="127" value="60"
+									data-sprites="100" data-src="./img/knobs/LittlePhatty.png"
+									onchange="subVolume=Number(value)*0.01;
+														get('subTip').innerHTML=value;fnMonText('logger','SubVolume %'+value);"
+									ondblclick="value=60;subVolume=0.6;"/>
+					<span id="subTip"  style="margin-left:-15;background:white;border: solid 5px white;border-radius:11px;opacity:0.7;">60</span>
+				</div>	
+			<p style="margin:0;">&nbsp&nbsp Main-sound Solo Style Chord setup. 
+					<label id='teo1lbl' mytip="use theory for chord setup"for="teo1">&nbsp&nbsp&nbsp&nbsp <b>click HERE to use theory-setup</b></label>
+						<input id='teo1'type="checkbox"
+									onclick="if(this.checked){/*dsply_frm('chordform','_frame');*/theoryQC=true;chordOctave=36;teo1lbl.innerHTML='<b>using theory-setup</b>';}
+									else {theoryQC=false;teo1lbl.innerHTML='&nbsp <b>click HERE to use theory-setup</b>';}">
+			</p>
+			<a href='javascript:SONG_RTHMSOLO(song0)'style="position:absolute;right:1;top:0;">DEMO</a>
+			<div ID="divQCHORDSboard" style='margin-top:0px;zoom:1'></div>
+			<div class="chordselector">
+				<select id='qcmodal'class="vertical" size="2" style="width:296;height:22;margin-left:4;">
+									 <option disabled style="font-size:14px;color:blue;">mod:
+					</option><option value="21" onclick='document.keyform.CHORDMODAL.options.selectedIndex=21;qccsub="";' selected="">maj
+					</option><option value="25" onclick='document.keyform.CHORDMODAL.options.selectedIndex=25;qccsub="9";'>9
+					</option><option value="35" onclick='document.keyform.CHORDMODAL.options.selectedIndex=35;qccsub="7";'>maj7
+					</option><option value="36" onclick='document.keyform.CHORDMODAL.options.selectedIndex=36;qccsub="9";'>maj9
+					</option><option value="2 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=2; qccsub="m";'>min
+					</option><option value="6 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=6; qccsub="m7";'>m7
+					</option><option value="7 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=7; qccsub="m9";'>m9
+					</option>
+				</select>
+				<br>&nbsp&nbsp
+				<span style="position:absolute;margin-left:-2">
+					full:<input style="margin-left:-9px;opacity:0.3;" type="CHECKBOX" value="off"onclick="if(this.checked)fullRange=true;else fullRange=false;">
+					<label mytip="random"class="recLabel">x<input type="radio" name="invertsac" onclick="if(this.checked)invertStyle=null;"></label>
+					<label mytip="normal"class="recLabel">3<input type="radio" name="invertsqc" onclick="if(this.checked)invertStyle=2;" checked></label>
+					<label mytip="bass"class="recLabel">2<input type="radio" name="invertsqc" onclick="if(this.checked)invertStyle=1;"></label>
+					<label mytip="extra"class="recLabel">1<input type="radio" name="invertsqc" onclick="if(this.checked)invertStyle=0;"></label>
+				</span>
+				<select id='qcoctave'class="vertical" size="2" style="height:22px;margin-top:2px;margin-left:5px;float:right;">
+									 <option disabled style="font-size: smaller; color:blue;">octave
+					</option><option value="0 " onclick='chordOctave= 0;'>c1
+					</option><option value="12" onclick='chordOctave=12;'>c2
+					</option><option value="24" onclick='chordOctave=24;'>c3
+					</option><option value="36" onclick='chordOctave=36;' selected="">c4
+					</option><option value="48" onclick='chordOctave=48;'>c5
+					</option><option value="60" onclick='chordOctave=60;'>c6
+					</option>
+				</select>
+			</div>
+		</span>		
+		<span id="RITHMDEMO">
+				<div id="COMPANY2" style="position:absolute;right:-99;">
+					<input mytip="rithmVolume" id="rVolume" class="input-knob" type="range" min="1" max="127" value="40"
+									data-sprites="100" data-src="./img/knobs/knob70.png"
+									onchange="RithmVolume=Number(value)*0.01;
+														get('accTip').innerHTML=value;fnMonText('logger','accVolume %'+value);"
+									ondblclick="value=40;RithmVolume=0.4;"/>
+					<span id="accTip" style="margin-left:-22;background:white;border: solid 5px white;border-radius:11px;opacity:0.7;">40</span>
+				</div>	
+			<p id="racc" style="background-color:#ffffff91;margin:0;">&nbsp&nbsp Chord Style Accompany:&nbsp&nbsp0180_Organ_Rock</p>
+			<a href="javascript:SONG_RTHMCHORD(song0)" style="position:absolute;right:1;top:0;">DEMO</a>
+			<div ID="divACCOMPANYboard" style='margin-top:0px;zoom:1'></div>
+			<div class="chordselector">
+				<select id='acmodal'class="vertical" size="2" style="width:296;height:22;margin-left:4">
+									 <option disabled style="font-size:14px;color:blue;">mod:
+					</option><option value="21" onclick='document.keyform.CHORDMODAL.options.selectedIndex=21;accsub="";' selected="">maj
+					</option><option value="25" onclick='document.keyform.CHORDMODAL.options.selectedIndex=25;accsub="9";'>9
+					</option><option value="35" onclick='document.keyform.CHORDMODAL.options.selectedIndex=35;accsub="7";'>maj7
+					</option><option value="36" onclick='document.keyform.CHORDMODAL.options.selectedIndex=36;accsub="9";'>maj9
+					</option><option value="2 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=2; accsub="m";'>min
+					</option><option value="6 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=6; accsub="m7";'>m7
+					</option><option value="7 " onclick='document.keyform.CHORDMODAL.options.selectedIndex=7; accsub="m9";'>m9
+					</option>
+				</select>
+				<br>&nbsp&nbsp
+				<span style="position:absolute;margin-left:-2">
+					full:<input style="margin-left:-9px;opacity:0.3;" type="CHECKBOX" value="off"onclick="if(this.checked)fullRange=true;else fullRange=false;">
+					<label mytip="random"class="recLabel">x<input type="radio" name="invertsac" onclick="if(this.checked)invertStyle=null;"></label>
+					<label mytip="normal"class="recLabel">3<input type="radio" name="invertsac" onclick="if(this.checked)invertStyle=2;" checked></label>
+					<label mytip="bass"class="recLabel">2<input type="radio" name="invertsac" onclick="if(this.checked)invertStyle=1;"></label>
+					<label mytip="extra"class="recLabel">1<input type="radio" name="invertsac" onclick="if(this.checked)invertStyle=0;"></label>
+				</span>
+				<select id='acoctave'class="vertical" size="2" style="height:22px;margin-top:2px;margin-left:5px;float:right;">
+									 <option disabled style="font-size: smaller; color:blue;">octave
+					</option><option value=" 0" onclick='chordOctave= 0;'>c1
+					</option><option value="12" onclick='chordOctave=12;'>c2
+					</option><option value="24" onclick='chordOctave=24;'>c3
+					</option><option value="36" onclick='chordOctave=36;' selected="">c4
+					</option><option value="48" onclick='chordOctave=48;'>c5
+					</option><option value="60" onclick='chordOctave=60;'>c6
+					</option>
+				</select>
+			</div>
+			<!-- 
+			<label class="ac_lbl"for="amaj">Maj. <input id='amaj' class="checky"type="radio"name="acs"onclick="if(this.checked)accsub='';"checked></label>
+			<label class="ac_lbl"for="amaj7">7th.<input id='amaj7'class="checky"type="radio"name="acs"onclick="if(this.checked)accsub='m7';"></label>		
+			<label class="ac_lbl"for="amin">min. <input id='amin' class="checky"type="radio"name="acs"onclick="if(this.checked)accsub='m';"></label>	
+			<label class="ac_lbl"for="amin7">min7<input id='amin7'class="checky"type="radio"name="acs"onclick="if(this.checked)accsub='7';"></label>					
+ -->
+			<p style="margin:0;float:right;width:273;">
+				<label id='teo2lbl' mytip="use theory for chord setup"for="teo2">&nbsp <b>click HERE to use theory-setup</b></label>
+					<input id='teo2'type="checkbox"
+						onclick="if(this.checked){/*dsply_frm('chordform','_frame');*/theoryAC=true;chordOctave=36;teo2lbl.innerHTML='<b>using theory.setup</b>';}
+						else {theoryAC=false;teo2lbl.innerHTML='&nbsp <b>click HERE to use theory-setup</b>';}">
+			</p>
+		</span>
+		</div>
+
+		<script src="vendors/WebAudioFontPlayer.js">//sf2js with midi support</script>
+		<script src="../SF2_Sets/_FullMidi/,,,FluidR3_GM_sf2.js"></script>
+		<script src="js/midi_instruments.js">/// midi descriptions</script>
+
+		<script src="js/__main.js"></script>
+		<script src="js/__myKeyboard.js"></script>
+		
+		<script src="midio/midiKeyboard_io.js"></script>
+		
+		<div><!--CHORD theory -->
+			<div id="chordform">
+				<form id="chordform_frame" name="keyform"style="display:none;cursor:default;">
+					<input type="radio" name="cordscal" value="0" onclick="document.keyform.CHORDMODAL.focus()"checked="" ><b>Chords Theory</b><br>
+					<div class="chordselector">
+						<select id="CHORDROOT" name="rootSelector" onclick="go(++rthmNDX); playchordFrml();" size="2">
+											 <option disabled style="font-size:14px;color:blue;"  selected="">root
+							</option><option value="1">C
+							</option><option value="2">C#
+							</option><option value="3">D
+							</option><option value="4">Eb
+							</option><option value="5">E
+							</option><option value="6">F
+							</option><option value="7">F#
+							</option><option value="8">G
+							</option><option value="9">Ab
+							</option><option value="10">A
+							</option><option value="11">Bb
+							</option><option value="12">B
+							</option>
+						</select>
+					</div>
+			<br><div class="chordselector">
+						<select name="CHORDMODAL" onchange="go()" onfocus="document.keyform.cordscal[0].checked=1; go()">
+											 <option value="3,8,">Sus 2
+							</option><option value="4,7,11,">m7b5
+							</option><option style="background-color:azure;" value="4,8,">min
+							</option><option style="background-color:azure;" value="4,8,3,">min+9
+							</option><option style="background-color:azure;" value="4,8,10,">min6
+							</option><option style="background-color:azure;" value="4,8,10,3,">min6+9
+							</option><option style="background-color:azure;" value="4,8,11,">min7th
+							</option><option style="background-color:azure;" value="4,8,11,">min9
+							</option><option style="background-color:azure;" value="4,8,11,2,">min7b9
+							</option><option style="background-color:azure;" value="4,8,11,3,6,">min11
+							</option><option style="background-color:azure;" value="4,8,11,3,10,">min13
+							</option><option style="background-color:azure;" value="4,8,11,6,">min7th+11
+							</option><option style="background-color:azure;" value="4,8,11,10,">min7th+13
+							</option><option style="background-color:azure;" value="4,8,12,">min/maj7th
+							</option><option style="background-color:azure;" value="4,8,12,3,">min/maj9
+							</option><option style="background-color:azure;" value="4,8,12,3,10,">min/maj13
+							</option><option style="background-color:azure;" value="4,8,12,3,6,">min/maj11
+							</option><option style="background-color:azure;" value="4,8,12,6,">min/maj7th+11
+							</option><option style="background-color:azure;" value="4,8,12,10,">min/maj7th+13
+							</option><option style="background-color:azure;" value="4,9,11,">min7#5
+							</option><option value="5,7,11,">7b5
+							</option><option style="background-color:pink;" value="5,8," selected="">maj
+							</option><option style="background-color:pink;" value="5,8,3,">+9
+							</option><option style="background-color:pink;" value="5,8,10,">6
+							</option><option style="background-color:pink;" value="5,8,10,3,">6+9
+							</option><option style="background-color:pink;" value="5,8,11,">9
+							</option><option style="background-color:pink;" value="5,8,11,">dom7th
+							</option><option style="background-color:pink;" value="5,8,11,2,">7b9
+							</option><option style="background-color:pink;" value="5,8,11,3,6,">11
+							</option><option style="background-color:pink;" value="5,8,11,3,7,">9#11
+							</option><option style="background-color:pink;" value="5,8,11,3,9,">9b13
+							</option><option style="background-color:pink;" value="5,8,11,3,10,">13
+							</option><option style="background-color:pink;" value="5,8,11,4,">7#9
+							</option><option style="background-color:pink;" value="5,8,11,6,">dom7th+11
+							</option><option style="background-color:pink;" value="5,8,11,10,">dom7th+13
+							</option><option style="background-color:pink;" value="5,8,12,">maj7th
+							</option><option style="background-color:pink;" value="5,8,12,">maj9
+							</option><option style="background-color:pink;" value="5,8,12,3,6,">maj11
+							</option><option style="background-color:pink;" value="5,8,12,3,10,">maj13
+							</option><option style="background-color:pink;" value="5,8,12,6,">maj7th+11
+							</option><option style="background-color:pink;" value="5,8,12,10,">maj7th+13
+							</option><option style="background-color:pink;" value="5,9,11,">7#5
+							</option><option style="background-color:pink;" value="5,9,11,2,">7#5b9
+							</option><option value="6,8,">Sus4
+							</option><option value="6,8,10,">6sus4
+							</option><option value="6,8,11,">7sus4
+							</option><option value="6,8,11,3,">9sus4
+							</option><option value="6,8,12,">maj7thSus4
+							</option><option value="6,8,12,3,">maj9Sus4
+							</option><option value="8,">5
+							</option>
+						</select>
+			 full:<input style="margin-left:-9px;opacity:0.3;" type="CHECKBOX" value="off" name="fullchord" onclick="if(this.checked)fullRange=true;else fullRange=false;">
+						<select class="vertical" size="2" style="height: 22px;">
+											 <option disabled style="font-size:14px;color:blue;">modal
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=21;' selected="">maj
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=25;'>9
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=35;'>maj7
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=36;'>maj9
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=2;'>min
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=6;'>m7
+							</option><option onclick='document.keyform.CHORDMODAL.options.selectedIndex=7;'>m9
+							</option>
+						</select>
+				<br><input style="font-size:20;" type="button" value="Invert.Chord" name="anno1" onclick="if(fullRange)fnFullRange();else fnInverter(invertStyle); playchordFrml();">
+						<label mytip="random"class="recLabel">o<input type="radio" name="inverts" onclick="if(this.checked)invertStyle=null;" checked=""></label>
+						<label mytip="extra bass"class="recLabel">1<input type="radio" name="inverts" onclick="if(this.checked)invertStyle=-1;"></label>
+						<label mytip="bass style"class="recLabel">2<input type="radio" name="inverts" onclick="if(this.checked)invertStyle=1;"></label>
+						<label mytip="standart"  class="recLabel">3<input type="radio" name="inverts" onclick="if(this.checked)invertStyle=2;"></label>			
+						<select class="vertical" size="2" style="height:22px;margin-top:2px;float:right;">
+											 <option disabled style="font-size: smaller; color:blue;">octave
+							</option><option value="1" onclick='chordOctave= 0;'>c1
+							</option><option value="2" onclick='chordOctave=12;'>c2
+							</option><option value="3" onclick='chordOctave=24;' selected="">c3
+							</option><option value="4" onclick='chordOctave=36;'>c4
+							</option><option value="5" onclick='chordOctave=48;'>c5
+							</option><option value="6" onclick='chordOctave=60;'>c6
+							</option>
+						</select>
+					</div>
+			<br><br>
+					<input type="text" name="formdisp" width="16" style="background-color:#8ac1c199;font-weight:800;width:230;margin-right:4;"
+									onfocus="playchordFrml();">
+					<label id="recordsong_label" for="recordrithm">Record</label>
+					<input type="CHECKBOX" value="off" id="recordrithm"style="margin-left:-9px;opacity:0.3;"
+									onclick="if(this.checked){chordArr=[['Root-Sub','dstrng','keynoArr']]/*clean*/;rthmNDX=0;}else log1.value='';">
+					<span>
+						<select ID="sound" style="position:absolute;right:10;">
+							<option value="-1" selected>sound+</option>
+							<option value="0">Piano</option>
+							<option value="1">Organ</option>
+							<option value="2">Acu.Guitar</option>
+							<option value="3">EDM, bro!</option>
+						</select><br><br>
+						<input mytip="Sound+ volume" id="volumeInput" class="pedal" type="range" min="1" max="10" value="6"
+								onchange="synthVolume=Number(this.value)*.1;">
+					</span>
+				<br><textarea id="log1" cols="30" rows="6"></textarea>
+					<input type="button"value="erase last" style="position:absolute;margin-top:66px;"onclick="chordArr.pop();addText(log1, 'bean');">
+					<input type="button" value="playrithm"style="position:absolute;"onclick="playMyrithm();">
+					<input type="button" value="Accompany"style="position:absolute;margin-top:22px;"onclick="playMyrithmChord();">
+			<br>
+			<br><input type="radio" name="cordscal" value="1" onclick="document.keyform.scale.focus()"><b>Scale</b>									
+					<select name="scale" size="1"style="font-size:11px;"onchange="go()" onfocus="document.keyform.cordscal[1].checked=1; go()">
+										 <option value="2212221" selected="">MaJO()r Scales
+						</option><option value="2122221">Minor scales
+						</option><option value="2122131">Harmonic Minor
+						</option><option value="2122221">Melodic Minor
+						</option><option value="23223">Pentatonic MaJO()r
+						</option><option value="32232">Pentatonic Minor
+						</option><option value="32113">Pentatonic Blues
+						</option><option value="2323">Pentatonic Neutral
+						</option><option value="2212221">Ionian
+						</option><option value="32122122">Aeolian
+						</option><option value="2122212">Dorian
+						</option><option value="2212212">Mixolydian
+						</option><option value="1222122">Phrygian
+						</option><option value="2221221">Lydian
+						</option><option value="1221222">Locrian
+						</option><option value="1212121">Dim half
+						</option><option value="2121212">Dim whole
+						</option><option value="22222">Whole
+						</option><option value="31313">Augmented
+						</option><option value="111111111111">Chromatic
+						</option><option value="2131212">Roumanian Minor
+						</option><option value="1312122">Spanish Gypsy
+						</option><option value="321132">Blues
+						</option><option value="22323">Diatonic
+						</option><option value="1312131">Double Harmonic
+						</option><option value="12111222">Eight Tone Spanish
+						</option><option value="1322211">Enigmatic
+						</option><option value="222211">Leading Whole Tone
+						</option><option value="2222121">Lydian Augmented
+						</option><option value="1222221">Neoploitan MaJO()r
+						</option><option value="1222122">Neopolitan Minor
+						</option><option value="12341">Pelog
+						</option><option value="222312">Prometheus
+						</option><option value="132312">Prometheus Neopolitan
+						</option><option value="131313">Six Tone Symmetrical
+						</option><option value="1212222">Super Locrian
+						</option><option value="2221122">Lydian Minor
+						</option><option value="2131122">Lydian Diminished
+						</option><option value="211211121">Nine Tone Scale
+						</option><option value="21212121">Auxiliary Diminished
+						</option><option value="222222">Auxiliary Augmented
+						</option><option value="12121212">Auxiliary Diminished Blues
+						</option><option value="2211222">MaJO()r Locrian
+						</option><option value="2221212">Overtone
+						</option><option value="1212222">Diminished Whole Tone
+						</option><option value="2122122">Pure Minor
+						</option><option value="232212">Dominant 7th
+						</option>
+					</select>
+		full: <input style="margin-left:-9px;opacity:0.3;" type="CHECKBOX" value="off" name="lingerscal" onclick="go()">
+			<br><input type="radio" name="cordscal" value="2" onclick="document.keyform.forminput.focus();"><b>Formula as</b>
+					<a href="javascript:openhelp()">how-to</a>
+			<br><input type="radio" name="notesnum" value="0" checked="">#s
+					<input type="radio" name="notesnum" value="1">Notes
+					<input type="radio" name="notesnum" value="2">Scale
+			<br><input type="text" name="forminput" width="15" style="background-color:lightyellow;"
+						onfocus=" document.keyform.formdisp.value=&#39;&#39;; document.keyform.cordscal[2].checked=1;"
+						onchange="playchordFrml();">
+					<input type="button" value="DisPLAY" name="goinput" onclick="go(); playchordFrml();">
+			<br><i style="font-size:12px; margin-left: 10px;">in C enharmonics.</i>
+					
+			</form>
+			</div>
+		</div>
+		<script src="vendors/audiosynth.js">//synth</script>
+		<script src="js/__Theory.js">// DISPLAY CHORD FORMULAS/// SIMULATE CLICKS & CREATE SYNTH AUDIO PLAY</script>
+		<a href="../SF2_Sets/index.html"style="color: azure;margin-top: 355;position: absolute;"><h1>SoundFonts</h1></a>
+	</body>
+</html>
